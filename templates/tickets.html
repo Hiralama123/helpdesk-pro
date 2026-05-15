@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Tickets{% endblock %}
+{% block topbar_title %}All Tickets{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Tickets</h2>
+  <p>{% if current_user.role == 'user' %}Your submitted tickets{% else %}All support tickets in the system{% endif %}</p>
+</div>
+
+<!-- Filter Bar -->
+<form method="GET" action="{{ url_for('tickets') }}" class="filter-bar">
+  <input type="text" name="search" class="form-control search-input"
+         placeholder="&#xF52A;  Search tickets…" value="{{ search }}"
+         style="font-family: 'Segoe UI', 'bootstrap-icons', sans-serif;">
+
+  <select name="status" class="form-select" style="width:145px;">
+    <option value="">All Statuses</option>
+    <option value="open"        {% if status_f == 'open'        %}selected{% endif %}>Open</option>
+    <option value="in_progress" {% if status_f == 'in_progress' %}selected{% endif %}>In Progress</option>
+    <option value="resolved"    {% if status_f == 'resolved'    %}selected{% endif %}>Resolved</option>
+    <option value="closed"      {% if status_f == 'closed'      %}selected{% endif %}>Closed</option>
+  </select>
+
+  <select name="priority" class="form-select" style="width:145px;">
+    <option value="">All Priorities</option>
+    <option value="low"      {% if priority_f == 'low'      %}selected{% endif %}>Low</option>
+    <option value="medium"   {% if priority_f == 'medium'   %}selected{% endif %}>Medium</option>
+    <option value="high"     {% if priority_f == 'high'     %}selected{% endif %}>High</option>
+    <option value="critical" {% if priority_f == 'critical' %}selected{% endif %}>Critical</option>
+  </select>
+
+  <select name="category" class="form-select" style="width:145px;">
+    <option value="">All Categories</option>
+    <option value="hardware" {% if category_f == 'hardware' %}selected{% endif %}>Hardware</option>
+    <option value="software" {% if category_f == 'software' %}selected{% endif %}>Software</option>
+    <option value="network"  {% if category_f == 'network'  %}selected{% endif %}>Network</option>
+  </select>
+
+  <button type="submit" class="btn-accent">
+    <i class="bi bi-funnel"></i> Filter
+  </button>
+
+  {% if status_f or priority_f or category_f or search %}
+  <a href="{{ url_for('tickets') }}" class="btn-outline-sm">
+    <i class="bi bi-x-circle"></i> Clear
+  </a>
+  {% endif %}
+</form>
+
+<!-- Ticket Table -->
+<div class="table-card">
+  <div class="table-card-header">
+    <h5>
+      <i class="bi bi-ticket-detailed" style="margin-right:6px;color:var(--text-muted);"></i>
+      {{ tickets | length }} ticket{{ 's' if tickets | length != 1 }}
+      {% if status_f or priority_f or category_f or search %}
+        <span style="font-size:.75rem;color:var(--text-light);font-weight:400;"> — filtered</span>
+      {% endif %}
+    </h5>
+    <a href="{{ url_for('create_ticket') }}" class="btn-accent" style="font-size:.8rem;padding:6px 14px;">
+      <i class="bi bi-plus-lg"></i> New Ticket
+    </a>
+  </div>
+
+  {% if tickets %}
+  <div style="overflow-x:auto;">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Submitted by</th>
+        <th>Assigned to</th>
+        <th>Last Updated</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in tickets %}
+      <tr>
+        <td><span class="ticket-number">{{ t.ticket_number }}</span></td>
+        <td style="max-width:280px;">
+          <a href="{{ url_for('ticket_detail', ticket_id=t.id) }}" class="ticket-title-link">
+            {{ t.title | truncate(60, true, '…') }}
+          </a>
+          <div class="ticket-meta">{{ t.created_at.strftime('%b %d, %Y') }}</div>
+        </td>
+        <td>
+          <span class="tag">
+            <i class="bi {{ t.category_icon }}"></i>
+            {{ t.category | capitalize }}
+          </span>
+        </td>
+        <td><span class="priority-badge {{ t.priority_class }}">{{ t.priority }}</span></td>
+        <td><span class="status-badge {{ t.status_class }}">{{ t.status_display }}</span></td>
+        <td style="font-size:.82rem;color:var(--text-muted);">{{ t.creator.full_name }}</td>
+        <td style="font-size:.82rem;color:var(--text-muted);">
+          {% if t.assignee %}
+            <span style="display:inline-flex;align-items:center;gap:5px;">
+              <span class="user-avatar" style="width:22px;height:22px;font-size:.6rem;">{{ t.assignee.initials }}</span>
+              {{ t.assignee.full_name }}
+            </span>
+          {% else %}
+            <span style="color:var(--text-light);">Unassigned</span>
+          {% endif %}
+        </td>
+        <td style="font-size:.8rem;color:var(--text-light);white-space:nowrap;">
+          {{ t.updated_at.strftime('%b %d, %H:%M') }}
+        </td>
+        <td>
+          <a href="{{ url_for('ticket_detail', ticket_id=t.id) }}" class="btn-outline-sm">
+            View <i class="bi bi-chevron-right"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-search"></i>
+    <strong>No tickets found</strong>
+    <p>Try adjusting your filters or <a href="{{ url_for('create_ticket') }}" style="color:var(--accent);">create a new ticket</a>.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

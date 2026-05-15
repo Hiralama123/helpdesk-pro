@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Welcome back, {{ current_user.full_name.split()[0] }} 👋</h2>
+  <p>Here's an overview of your IT Help Desk activity.</p>
+</div>
+
+<!-- Stat Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon icon-total"><i class="bi bi-stack"></i></div>
+    <div class="stat-value">{{ stats.total }}</div>
+    <div class="stat-label">Total Tickets</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon icon-open"><i class="bi bi-envelope-open"></i></div>
+    <div class="stat-value">{{ stats.open }}</div>
+    <div class="stat-label">Open</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon icon-progress"><i class="bi bi-arrow-repeat"></i></div>
+    <div class="stat-value">{{ stats.in_progress }}</div>
+    <div class="stat-label">In Progress</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon icon-resolved"><i class="bi bi-check-circle"></i></div>
+    <div class="stat-value">{{ stats.resolved }}</div>
+    <div class="stat-label">Resolved</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon icon-closed"><i class="bi bi-archive"></i></div>
+    <div class="stat-value">{{ stats.closed }}</div>
+    <div class="stat-label">Closed</div>
+  </div>
+  <div class="stat-card" style="border-color:{% if stats.critical > 0 %}#fca5a5{% else %}var(--border){% endif %};">
+    <div class="stat-icon icon-critical"><i class="bi bi-exclamation-triangle"></i></div>
+    <div class="stat-value" style="color:{% if stats.critical > 0 %}#dc2626{% else %}inherit{% endif %};">{{ stats.critical }}</div>
+    <div class="stat-label">Critical Open</div>
+  </div>
+</div>
+
+<!-- Recent Tickets -->
+<div class="table-card">
+  <div class="table-card-header">
+    <h5><i class="bi bi-clock-history" style="margin-right:6px;color:var(--text-muted);"></i>Recent Tickets</h5>
+    <a href="{{ url_for('tickets') }}" class="btn-outline-sm">View All <i class="bi bi-arrow-right"></i></a>
+  </div>
+
+  {% if recent %}
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Submitted by</th>
+        <th>Assigned to</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in recent %}
+      <tr>
+        <td><span class="ticket-number">{{ t.ticket_number }}</span></td>
+        <td>
+          <a href="{{ url_for('ticket_detail', ticket_id=t.id) }}" class="ticket-title-link">
+            {{ t.title | truncate(55, true, '…') }}
+          </a>
+        </td>
+        <td>
+          <span class="tag">
+            <i class="bi {{ t.category_icon }}"></i>
+            {{ t.category | capitalize }}
+          </span>
+        </td>
+        <td><span class="priority-badge {{ t.priority_class }}">{{ t.priority }}</span></td>
+        <td><span class="status-badge {{ t.status_class }}">{{ t.status_display }}</span></td>
+        <td style="font-size:.8rem;color:var(--text-muted);">{{ t.creator.full_name }}</td>
+        <td style="font-size:.8rem;color:var(--text-muted);">
+          {{ t.assignee.full_name if t.assignee else '—' }}
+        </td>
+        <td style="font-size:.8rem;color:var(--text-light);white-space:nowrap;">
+          {{ t.created_at.strftime('%b %d, %Y') }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-ticket"></i>
+    <strong>No tickets yet</strong>
+    <p><a href="{{ url_for('create_ticket') }}" style="color:var(--accent);">Create the first ticket</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

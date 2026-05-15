@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}New Ticket{% endblock %}
+{% block topbar_title %}Create New Ticket{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Submit a New Ticket</h2>
+  <p>Describe your IT issue and we'll assign it to the right technician.</p>
+</div>
+
+<div style="max-width:720px;">
+  <div class="form-card">
+    <form method="POST" action="{{ url_for('create_ticket') }}" novalidate>
+
+      <div class="mb-4">
+        <label class="form-label" for="title">
+          <i class="bi bi-card-heading" style="color:var(--accent);margin-right:5px;"></i>
+          Ticket Title <span style="color:#dc2626;">*</span>
+        </label>
+        <input type="text" class="form-control" id="title" name="title"
+               placeholder="Brief summary of the issue, e.g. 'Cannot log into email'" required maxlength="200">
+        <div style="font-size:.75rem;color:var(--text-light);margin-top:4px;">Keep it short and descriptive</div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="description">
+          <i class="bi bi-text-left" style="color:var(--accent);margin-right:5px;"></i>
+          Description <span style="color:#dc2626;">*</span>
+        </label>
+        <textarea class="form-control" id="description" name="description" rows="5"
+                  placeholder="Describe the issue in detail:&#10;• What happened?&#10;• When did it start?&#10;• Who is affected?&#10;• What have you already tried?" required></textarea>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label" for="priority">
+            <i class="bi bi-flag" style="color:var(--accent);margin-right:5px;"></i>
+            Priority <span style="color:#dc2626;">*</span>
+          </label>
+          <select class="form-select" id="priority" name="priority" required>
+            <option value="" disabled selected>Select priority…</option>
+            <option value="low">🟢  Low — Minor inconvenience</option>
+            <option value="medium" selected>🟡  Medium — Affecting productivity</option>
+            <option value="high">🔴  High — Major impact / system down</option>
+            <option value="critical">⚫  Critical — Business stopped</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="category">
+            <i class="bi bi-tag" style="color:var(--accent);margin-right:5px;"></i>
+            Category <span style="color:#dc2626;">*</span>
+          </label>
+          <select class="form-select" id="category" name="category" required>
+            <option value="" disabled selected>Select category…</option>
+            <option value="hardware">🖥  Hardware — Devices, peripherals, physical</option>
+            <option value="software">💻  Software — Apps, OS, licenses</option>
+            <option value="network">📡  Network — Wi-Fi, VPN, internet</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Priority guide -->
+      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:24px;font-size:.8rem;color:var(--text-muted);">
+        <strong style="color:var(--text-main);">Priority Guide</strong>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">
+          <div><span class="priority-badge badge-low" style="font-size:.7rem;">Low</span> No urgency, workaround exists</div>
+          <div><span class="priority-badge badge-medium" style="font-size:.7rem;">Medium</span> Slowing down work</div>
+          <div><span class="priority-badge badge-high" style="font-size:.7rem;">High</span> Critical system or team blocked</div>
+          <div><span class="priority-badge badge-critical" style="font-size:.7rem;">Critical</span> Business halted, immediate</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;">
+        <button type="submit" class="btn-accent" style="padding:10px 24px;font-size:.9rem;">
+          <i class="bi bi-send"></i> Submit Ticket
+        </button>
+        <a href="{{ url_for('tickets') }}" class="btn-outline-sm" style="padding:9px 16px;">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
