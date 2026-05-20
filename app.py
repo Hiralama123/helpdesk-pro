@@ -283,7 +283,8 @@ def update_ticket(ticket_id):
     return redirect(url_for('ticket_detail', ticket_id=ticket_id))
 
 
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
-    with app.app_context():
-        seed_db()
     app.run(debug=True)
