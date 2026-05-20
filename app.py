@@ -4,6 +4,8 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
+from app import app, db, seed_db
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'helpdesk-secret-key-change-in-production')
@@ -285,6 +287,5 @@ def update_ticket(ticket_id):
 
 with app.app_context():
     db.create_all()
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    seed_db()
+    print("Database initialized!")
